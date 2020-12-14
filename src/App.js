@@ -1,24 +1,18 @@
-import logo from './logo.svg';
+import React, { Component, useState } from 'react';
+import { Container, Row, Col, Button } from 'reactstrap';
 import './App.css';
 
 function App() {
+  // const [state, setstate] = useState(initialState)
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container className="container">
+      <Row className="center">
+        <h1 className="title">Common Songs</h1>
+        <p className="subtitle">Find what songs you have in common</p>
+        <Button className="logInBtn" onClick={() => console.log("button clicked")} color="">LOG IN WITH SPOTIFY</Button>
+      </Row>
+    </Container>
   );
 }
 
