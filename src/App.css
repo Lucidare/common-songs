@@ -26,7 +26,7 @@
   color: var(--white);
 }
 
-.logInBtn {
+.greenBtn {
   background-color: var(--green);
   color: var(--white);
   font-weight: bold;
@@ -36,10 +36,10 @@
   border-radius: 30px;
   border-color:  var(--green)
 }
-.logInBtn:hover {
+.greenBtn:hover {
   background-color: var(--light-green);
 }
-.logInBtn:active {
+.greenBtn:active {
   background-color: var(--dark-green);
 }
 
