@@ -51,8 +51,8 @@ function App() {
       <Row className="center">
         <h1 className="title">Common Songs</h1>
         <p className="subtitle">Find what songs you have in common</p>
-        {user != null && 
-          <User name={user.display_name} img={user.images[0].url}/>
+        {user != null &&
+          <User name={user.display_name} images={user.images}/>
         }
         {playlists.length > 0 &&
           <Playlists playlists={playlists}/>
