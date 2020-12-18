@@ -9,11 +9,12 @@
 .container {
   width: 100%;
   height: 100%;
-  position: fixed;
+  position: relative;
   display: flex;
   background-color: var(--black);
   text-align: center;
   justify-content: center;
+  padding-bottom: 30px;
 }
 
 .title {
@@ -37,7 +38,9 @@
   font-weight: bold;
   padding-top: 10px;
   padding-bottom: 10px;
-  width: 100%;
+  padding-left: 50px;
+  padding-right: 50px;
+  /* width: 100%; */
   border-radius: 30px;
   border-color:  var(--green)
 }
@@ -61,4 +64,8 @@
 
 .playlist {
   padding: 0;
+}
+
+.spaced {
+  padding: 20px;
 }
