@@ -40,7 +40,7 @@ function App() {
     NOT_APPLICIABLE: "",
     CREATING: "Creating Playlist...",
     ADDING: "Adding Songs...",
-    ERROR: "Internal server error, please try again later (Some songs may be missing from playlist)"
+    ERROR: "Internal Server Error, please try again later (Some songs may be missing from playlist)"
   }
   const [newPlaylistState, setNewPlaylistState] = useState(newPlaylistStates.NOT_APPLICIABLE);
 
@@ -257,6 +257,7 @@ function App() {
             : <Button className="greenBtn" onClick={logout}>LOG OUT</Button>
           }
         </div>
+        <p className="text">© Brian Au 2020</p>
       </Row>
     </Container>
   );
