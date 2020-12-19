@@ -74,3 +74,8 @@ html, body {
 .spaced {
   padding: 20px;
 }
+
+.coffee {
+  height: 60px !important;
+  width: 217px !important;
+}

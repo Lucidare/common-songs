@@ -3,7 +3,8 @@ import { Container, Row, Button } from 'reactstrap';
 import User from './components/User';
 import Playlists from './components/Playlists';
 import SongList from './components/SongList';
-import Input from './components/Input'; 
+import Input from './components/Input';
+import Coffee from './components/BuyMeACoffee';
 import Spotify from './networking/SpotifyAPI';
 import './App.css';
 import ReactGA from 'react-ga';
@@ -113,16 +114,24 @@ function App() {
     setSongsState(otherSongsState.NOT_APPLICIABLE);
     setCommon([]);
     setNewPlaylistState(newPlaylistStates.NOT_APPLICIABLE);
+    spotifyApi.cancelTokenSource.cancel();
   }
 
   function readInput() {
     var split = input.trim().split(":");
+    var isPlaylist = true;
+    var id = "";
     if (split.length !== 3) {
       split = input.trim().split("/");
-      if (split.length === 5 && split[0] === "https:" && split[1] === "" && split[2] === "open.spotify.com" && split[3] === "playlist") {
-        split = split[4].split("?")
-        if (split.length > 0 && split.length <= 2) {
-          getPlaylistFromId(split[0]);
+      if (split.length === 5 && split[0] === "https:" && split[1] === "" && split[2] === "open.spotify.com") {
+        if (split[3] === "playlist" || split[3] === "user") {
+          split = split[4].split("?")
+          isPlaylist = split[3] === "playlist"
+          if (split.length > 0 && split.length <= 2) {
+            id = split[0];
+          } else {
+            setSongsState(otherSongsState.INVALID);
+          }
         } else {
           setSongsState(otherSongsState.INVALID);
         }
@@ -130,15 +139,29 @@ function App() {
         setSongsState(otherSongsState.INVALID);
       }
     } else {
-      if (split[0] === "spotify" && split[1] === "playlist") {
-        getPlaylistFromId(split[2]);
+      if (split[0] === "spotify") {
+        if (split[1] === "playlist" || split[1] === "user") {
+          isPlaylist = split[1] === "playlist"
+          id = split[2]
+        } else {
+          setSongsState(otherSongsState.INVALID);
+        }
       } else {
         setSongsState(otherSongsState.INVALID);
       }
     }
+
+    if (id != "") {
+      if (isPlaylist) {
+        getSongsFromPlaylist(id);
+      } else {
+        // getUsersPlaylists(id);
+      }
+    }
+
   }
 
-  function getPlaylistFromId(id) {
+  function getSongsFromPlaylist(id) {
     setCommon([]);
     setSongsState(otherSongsState.LOADING);
 
@@ -258,6 +281,7 @@ function App() {
           }
         </div>
         <p className="text">© Brian Au 2020</p>
+        <Coffee/>
       </Row>
     </Container>
   );
