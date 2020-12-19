@@ -1,12 +1,14 @@
 import React from 'react';
 
 export default function Song(props) {
+
     return (
         <div>
-            <p className="text">
-                {props.song.name}
-            </p>
-            {/* {console.log(props.song.track)} */}
+            <div className="text">
+                {props.song.name} - {props.song.artists.map(artist => {
+                    return artist.name
+                }).join(", ")}
+            </div>
         </div>
     );
 }

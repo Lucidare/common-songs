@@ -4,15 +4,15 @@ const baseURL = 'https://api.spotify.com/v1/'
 
 var Spotify = (function () {
     var _token = null;
-    var _market = "";
+    var _userId = null;
 
     this.setToken = (token) => {
         _token = token;
     };
 
-    this.setMarket = (market) => {
-        _market = market
-    }
+    this.setUserId = (id) => {
+        _userId = id;
+    };
 
     this.getMe = () => {
         return axios.get(baseURL + "me", { headers: { Authorization: 'Bearer ' + _token } });
@@ -26,8 +26,37 @@ var Spotify = (function () {
         return axios.get(baseURL + "me/tracks?market=from_token&offset=" + offset + "&limit=" + limit, { headers: { Authorization: 'Bearer ' + _token } });
     }
 
-    this.getPlaylist = (id, offset = 0, limit = 100) => {
+    this.getPlaylistSongs = (id, offset = 0, limit = 100) => {
         return axios.get(baseURL + "playlists/" + id + "/tracks?market=from_token&offset=" + offset + "&limit=" + limit, { headers: { Authorization: 'Bearer ' + _token } });
+    }
+    
+    this.getPlaylist = (id) => {
+        return axios.get(baseURL + "playlists/" + id, { headers: { Authorization: 'Bearer ' + _token } });
+    }
+
+    this.createPlaylist = (name) => {
+        return axios.post(baseURL + "users/" + _userId + "/playlists", {
+            name: "Common Songs with " + name,
+            description: "Created by https://common-songs.com"
+        } ,{
+            headers: {
+                Authorization: 'Bearer ' + _token,
+                Accept: 'application.json'
+            },
+            
+        });
+    }
+
+    this.addToPlaylist = (id, songs) => {
+        return axios.post(baseURL + "playlists/" + id + "/tracks", {
+            uris: songs
+        } ,{
+            headers: {
+                Authorization: 'Bearer ' + _token,
+                Accept: 'application.json'
+            },
+            
+        });
     }
 })
 

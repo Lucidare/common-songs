@@ -16,24 +16,34 @@ function App() {
   const [user, setUser] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const [likedSongs, setLikedSongs] = useState([]);
-  const [songs, setSongs] = useState([]);
   const [input, setInput] = useState("");
+  const [playlistName, setPlaylistName] = useState("");
   const [common, setCommon] = useState([]);
   const likedSongsStates = {
     NOT_APPLICIABLE: "",
     LOADING: "Retrieving your liked songs...",
     FAILED: "Unable to get your liked songs, please try again later",
-    COMPLETE: "Completed"
+    COMPLETE: "Retrieved"
   }
   const [likedSongsState, setLikedSongState]  = useState(likedSongsStates.NOT_APPLICIABLE);
+
   const otherSongsState= {
     NOT_APPLICIABLE: "",
     INVALID: "INVALID INPUT",
     LOADING: "Getting Songs...",
+    ERROR: "Unable to get songs, please try again later",
     COMPARING: "Finding Common Songs...",
     COMPLETE: "Common Songs Found"
   }
   const [songsState, setSongsState] = useState(input.NOT_APPLICIABLE);
+  const newPlaylistStates= {
+    NOT_APPLICIABLE: "",
+    CREATING: "Creating Playlist...",
+    ADDING: "Adding Songs...",
+    ERROR: "Internal server error, please try again later (Some songs may be missing from playlist)"
+  }
+  const [newPlaylistState, setNewPlaylistState] = useState(newPlaylistStates.NOT_APPLICIABLE);
+
   document.title = "Common Songs"
 
   useEffect(() => {
@@ -49,6 +59,8 @@ function App() {
       spotifyApi.setToken(token);
       
       spotifyApi.getMe().then((response) => {
+        setUser(response.data);
+        spotifyApi.setUserId(response.data.id);
       }).catch((error) => {
         console.log(error);
       });
@@ -98,41 +110,67 @@ function App() {
     setPlaylists([]);
     setLikedSongs([]);
     setLikedSongState(likedSongsStates.NOT_APPLICIABLE)
-    setSongs([]);
     setSongsState(otherSongsState.NOT_APPLICIABLE)
+    setCommon([]);
   }
 
-  function validateInput() {
-    const split = input.split(":");
+  function readInput() {
+    var split = input.trim().split(":");
     if (split.length !== 3) {
-      setSongsState(otherSongsState.INVALID)
+      split = input.trim().split("/");
+      if (split.length === 5 && split[0] === "https:" && split[1] === "" && split[2] === "open.spotify.com" && split[3] === "playlist") {
+        split = split[4].split("?")
+        if (split.length > 0 && split.length <= 2) {
+          getPlaylistFromId(split[0]);
+        } else {
+          setSongsState(otherSongsState.INVALID);
+        }
+      } else {
+        setSongsState(otherSongsState.INVALID);
+      }
     } else {
       if (split[0] === "spotify" && split[1] === "playlist") {
-        getPlaylist(split[2]);
-        setSongsState(otherSongsState.COMPLETE)
+        getPlaylistFromId(split[2]);
       } else {
-        setSongsState(otherSongsState.INVALID)
+        setSongsState(otherSongsState.INVALID);
       }
-      
     }
   }
 
-  function getPlaylist(id, offset = 0, oldSongs = []) {
+  function getPlaylistFromId(id) {
+    setCommon([]);
+    setSongsState(otherSongsState.LOADING);
+
+    getPlaylistSongs(id);
+    getPlaylist(id);
+  }
+
+  function getPlaylist(id) {
+    spotifyApi.getPlaylist(id).then((response) => {
+      setPlaylistName(response.data.name);
+    }).catch((error) =>{
+      console.log(error);
+    });
+  }
+
+  function getPlaylistSongs(id, offset = 0, oldSongs = []) {
     const NUM_SONGS  = 100;
-    spotifyApi.getPlaylist(id, offset).then((response) => {
+    spotifyApi.getPlaylistSongs(id, offset).then((response) => {
       const data = response.data;
       const items = response.data.items.map(obj => {
         return obj.track;
-      });  
+      });
       const newSongs = [...oldSongs, ...items]
       if (data.next != null) {
-        getPlaylist(id, offset + NUM_SONGS, newSongs);
+        getPlaylistSongs(id, offset + NUM_SONGS, newSongs);
       } else {
-        setSongs(newSongs);
         setSongsState(otherSongsState.COMPARING)
         findCommonSongs(newSongs)
       }
-    })
+    }).catch((error) => {
+      setSongsState(otherSongsState.ERROR);
+      console.log(error);
+    });
   }
 
   function findCommonSongs(list) {
@@ -150,6 +188,41 @@ function App() {
     return false;
   }
 
+  function makeNewPlaylist() {
+    setNewPlaylistState(newPlaylistStates.CREATING);
+    spotifyApi.createPlaylist(playlistName).then((response) => {
+      const data = response.data;
+      const id = data.id;
+      setNewPlaylistState(newPlaylistStates.ADDING);
+      addAllSongsToNewPlaylist(id);
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
+
+  function addAllSongsToNewPlaylist(id) {
+    var i,j,chunk = 100;
+    var uris = common.map(track => {
+      return track.uri;
+    })
+    var numCallsNeeded = (uris.length/100)|0;
+    var numCallsCompleted = 0;
+    var numCallsFailed = 0;
+    for (i=0,j=uris.length; i<j; i+=chunk) {
+      spotifyApi.addToPlaylist(id, uris.slice(i,i+chunk)).then((response) => {
+        if (numCallsCompleted === numCallsNeeded && numCallsFailed === 0) {
+          setNewPlaylistState("https://open.spotify.com/playlist/" + id);
+        }
+      }).catch((error) => {
+        setNewPlaylistState(newPlaylistStates.ERROR + " https://open.spotify.com/playlist/" + id);
+        console.log(error);
+        numCallsFailed += 1;
+      }).finally(() => {
+        numCallsCompleted += 1;
+      });
+    }
+  }
+
   return (
     <Container className="container">
       <Row className="center">
@@ -158,14 +231,11 @@ function App() {
         {user != null &&
           <User name={user.display_name} images={user.images}/>
         }
-        {/* {playlists.length > 0 &&
-          <Playlists playlists={playlists}/>
-        } */}
         {likedSongsState !== likedSongsStates.NOT_APPLICIABLE &&
           <p className="text">Liked Songs: {likedSongsState}</p>
         }
         {likedSongsState === likedSongsStates.COMPLETE && 
-          <Input input={input} setInput={setInput} validateInput={validateInput}/>
+          <Input input={input} setInput={setInput} validateInput={readInput}/>
         }
         <p className="subtitle">{songsState}</p>
         {songsState === otherSongsState.COMPLETE &&
@@ -173,15 +243,17 @@ function App() {
         }
         
         {common.length > 0 &&
-          <SongList title="" songs={common}/>
+          <SongList makeNewPlaylist={makeNewPlaylist} songs={common}/>
+        }
+
+        {newPlaylistState !== newPlaylistStates.NOT_APPLICIABLE &&
+          <p className="text">{newPlaylistState}</p>
         }
 
         <div>
           {localStorage.getItem("token") == null 
-            ? ( <Button className="greenBtn" onClick={login}>LOG IN WITH SPOTIFY</Button> )
-            : (
-              <Button className="greenBtn" onClick={logout}>LOG OUT</Button>
-            )
+            ? <Button className="greenBtn" onClick={login}>LOG IN WITH SPOTIFY</Button>
+            : <Button className="greenBtn" onClick={logout}>LOG OUT</Button>
           }
         </div>
       </Row>
