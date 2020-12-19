@@ -109,9 +109,10 @@ function App() {
     setUser(null);
     setPlaylists([]);
     setLikedSongs([]);
-    setLikedSongState(likedSongsStates.NOT_APPLICIABLE)
-    setSongsState(otherSongsState.NOT_APPLICIABLE)
+    setLikedSongState(likedSongsStates.NOT_APPLICIABLE);
+    setSongsState(otherSongsState.NOT_APPLICIABLE);
     setCommon([]);
+    setNewPlaylistState(newPlaylistStates.NOT_APPLICIABLE);
   }
 
   function readInput() {
