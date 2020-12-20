@@ -6,7 +6,6 @@ import SongList from './components/SongList';
 import Input from './components/Input';
 import Coffee from './components/BuyMeACoffee';
 import Spotify from './networking/SpotifyAPI';
-import spotify_icon from './spotify-icons-logos/icons/01_RGB/02_PNG/Spotify_Icon_RGB_White.png'
 import spotify_logo from './spotify-icons-logos/logos/01_RGB/02_PNG/Spotify_Logo_RGB_White.png'
 import './App.css';
 import ReactGA from 'react-ga';
@@ -19,13 +18,17 @@ function App() {
   const [user, setUser] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const [likedSongs, setLikedSongs] = useState([]);
+  
   const [input, setInput] = useState("");
+
+  const [userPlaylists, setUserPlaylists] = useState([]);
+
   const [playlistName, setPlaylistName] = useState("");
   const [common, setCommon] = useState([]);
   const likedSongsStates = {
     NOT_APPLICIABLE: "",
     LOADING: "Retrieving your liked songs...",
-    FAILED: "Unable to get your liked songs, please try again later",
+    FAILED: "Unable to get your liked songs, please log in again",
     COMPLETE: "Retrieved"
   }
   const [likedSongsState, setLikedSongState]  = useState(likedSongsStates.NOT_APPLICIABLE);
@@ -93,6 +96,7 @@ function App() {
           }
         }).catch((error) => {
           setLikedSongState(likedSongsStates.FAILED);
+          localStorage.removeItem("token");
           console.log(error);
         });
       }
@@ -152,7 +156,7 @@ function App() {
       }
     }
 
-    if (id != "") {
+    if (id !== "") {
       if (isPlaylist) {
         getSongsFromPlaylist(id);
       } else {
@@ -262,6 +266,11 @@ function App() {
         {likedSongsState === likedSongsStates.COMPLETE && 
           <Input input={input} setInput={setInput} validateInput={readInput}/>
         }
+
+        {userPlaylists.length > 0 &&
+          <div>User playlists</div>
+        }
+
         <p className="subtitle">{songsState}</p>
         {songsState === otherSongsState.COMPLETE &&
           <p className="text">Total: {common.length ?? 0}</p>
