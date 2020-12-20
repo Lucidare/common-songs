@@ -21,19 +21,21 @@ function App() {
   
   const [input, setInput] = useState("");
 
-  const [userPlaylists, setUserPlaylists] = useState([]);
+  const [searchUser, setSearchUser] = useState({name: ""});
+  const [searchUserPlaylists, setSearchUserPlaylists] = useState([]);
 
   const [playlistName, setPlaylistName] = useState("");
   const [common, setCommon] = useState([]);
-  const likedSongsStates = {
+
+  const firstSongsStates = {
     NOT_APPLICIABLE: "",
     LOADING: "Retrieving your liked songs...",
     FAILED: "Unable to get your liked songs, please log in again",
     COMPLETE: "Retrieved"
   }
-  const [likedSongsState, setLikedSongState]  = useState(likedSongsStates.NOT_APPLICIABLE);
+  const [firstSongsState, setFirstSongsState]  = useState(firstSongsStates.NOT_APPLICIABLE);
 
-  const otherSongsState= {
+  const otherSongsStates= {
     NOT_APPLICIABLE: "",
     INVALID: "INVALID INPUT",
     LOADING: "Getting Songs...",
@@ -41,7 +43,8 @@ function App() {
     COMPARING: "Finding Common Songs...",
     COMPLETE: "Common Songs Found"
   }
-  const [songsState, setSongsState] = useState(input.NOT_APPLICIABLE);
+  const [otherSongsState, setOtherSongsState] = useState(input.NOT_APPLICIABLE);
+
   const newPlaylistStates= {
     NOT_APPLICIABLE: "",
     CREATING: "Creating Playlist...",
@@ -71,7 +74,7 @@ function App() {
         console.log(error);
       });
 
-      spotifyApi.getPlaylists().then((response) => {
+      spotifyApi.getMyPlaylists().then((response) => {
         setPlaylists(response.data.items);
       }).catch((error) => {
         console.log(error);
@@ -92,18 +95,18 @@ function App() {
             getLikedSongs(offset + NUM_SONGS, newSongs);
           } else {
             setLikedSongs(newSongs);
-            setLikedSongState(likedSongsStates.COMPLETE);
+            setFirstSongsState(firstSongsStates.COMPLETE);
           }
         }).catch((error) => {
-          setLikedSongState(likedSongsStates.FAILED);
+          setFirstSongsState(firstSongsStates.FAILED);
           localStorage.removeItem("token");
           console.log(error);
         });
       }
-      setLikedSongState(likedSongsStates.LOADING);
+      setFirstSongsState(firstSongsStates.LOADING);
       getLikedSongs();
     }
-  }, [likedSongsStates.FAILED, likedSongsStates.COMPLETE, likedSongsStates.LOADING]);
+  }, [firstSongsStates.FAILED, firstSongsStates.COMPLETE, firstSongsStates.LOADING]);
 
   function login() {
     window.location = window.location.href.includes('localhost')
@@ -116,8 +119,10 @@ function App() {
     setUser(null);
     setPlaylists([]);
     setLikedSongs([]);
-    setLikedSongState(likedSongsStates.NOT_APPLICIABLE);
-    setSongsState(otherSongsState.NOT_APPLICIABLE);
+    setFirstSongsState(firstSongsStates.NOT_APPLICIABLE);
+    setOtherSongsState(otherSongsStates.NOT_APPLICIABLE);
+    setSearchUser(null);
+    setSearchUserPlaylists([]);
     setCommon([]);
     setNewPlaylistState(newPlaylistStates.NOT_APPLICIABLE);
   }
@@ -135,13 +140,13 @@ function App() {
           if (split.length > 0 && split.length <= 2) {
             id = split[0];
           } else {
-            setSongsState(otherSongsState.INVALID);
+            setOtherSongsState(otherSongsStates.INVALID);
           }
         } else {
-          setSongsState(otherSongsState.INVALID);
+          setOtherSongsState(otherSongsStates.INVALID);
         }
       } else {
-        setSongsState(otherSongsState.INVALID);
+        setOtherSongsState(otherSongsStates.INVALID);
       }
     } else {
       if (split[0] === "spotify") {
@@ -149,10 +154,10 @@ function App() {
           isPlaylist = split[1] === "playlist"
           id = split[2]
         } else {
-          setSongsState(otherSongsState.INVALID);
+          setOtherSongsState(otherSongsStates.INVALID);
         }
       } else {
-        setSongsState(otherSongsState.INVALID);
+        setOtherSongsState(otherSongsStates.INVALID);
       }
     }
 
@@ -160,6 +165,7 @@ function App() {
       if (isPlaylist) {
         getSongsFromPlaylist(id);
       } else {
+        setOtherSongsState("User's not supported yet");
         // getUsersPlaylists(id);
       }
     }
@@ -168,16 +174,26 @@ function App() {
 
   function getSongsFromPlaylist(id) {
     setCommon([]);
-    setSongsState(otherSongsState.LOADING);
+    setOtherSongsState(otherSongsStates.LOADING);
 
     getPlaylistSongs(id);
-    getPlaylist(id);
+    getPlaylistName(id);
   }
 
-  function getPlaylist(id) {
-    spotifyApi.getPlaylist(id).then((response) => {
+  function getUsersPlaylists(id) {
+    console.log(id);
+    spotifyApi.getPlaylists(id).then((response) => {
+      setSearchUserPlaylists(response.data.items);
+      console.log(response);
+    }).catch((error => {
+      console.log(error);
+    }));
+  }
+
+  function getPlaylistName(id) {
+    spotifyApi.getPlaylistInfo(id).then((response) => {
       setPlaylistName(response.data.name);
-    }).catch((error) =>{
+    }).catch((error) => {
       console.log(error);
     });
   }
@@ -193,11 +209,11 @@ function App() {
       if (data.next != null) {
         getPlaylistSongs(id, offset + NUM_SONGS, newSongs);
       } else {
-        setSongsState(otherSongsState.COMPARING)
+        setOtherSongsState(otherSongsStates.COMPARING)
         findCommonSongs(newSongs)
       }
     }).catch((error) => {
-      setSongsState(otherSongsState.ERROR);
+      setOtherSongsState(otherSongsStates.ERROR);
       console.log(error);
     });
   }
@@ -205,7 +221,7 @@ function App() {
   function findCommonSongs(list) {
     let intersect = [...likedSongs].filter(song => contains(list, song));
     setCommon(intersect);
-    setSongsState(otherSongsState.COMPLETE)
+    setOtherSongsState(otherSongsStates.COMPLETE)
   }
 
   function contains(list, obj) {
@@ -260,19 +276,22 @@ function App() {
         {user != null &&
           <User name={user.display_name} images={user.images}/>
         }
-        {likedSongsState !== likedSongsStates.NOT_APPLICIABLE &&
-          <p className="text">Liked Songs: {likedSongsState}</p>
+        {firstSongsState !== firstSongsStates.NOT_APPLICIABLE &&
+          <p className="text">Liked Songs: {firstSongsState}</p>
         }
-        {likedSongsState === likedSongsStates.COMPLETE && 
+        {firstSongsState === firstSongsStates.COMPLETE && 
           <Input input={input} setInput={setInput} validateInput={readInput}/>
         }
 
-        {userPlaylists.length > 0 &&
-          <div>User playlists</div>
+        {/* {searchUser != null &&
+          <User name={searchUser.name} images={searchUser.images}/>
+        } */}
+        {searchUserPlaylists.length > 0 &&
+          <Playlists onClick={() => {}} playlists={searchUserPlaylists}/>
         }
 
-        <p className="subtitle">{songsState}</p>
-        {songsState === otherSongsState.COMPLETE &&
+        <p className="subtitle">{otherSongsState}</p>
+        {otherSongsState === otherSongsStates.COMPLETE &&
           <p className="text">Total: {common.length ?? 0}</p>
         }
         

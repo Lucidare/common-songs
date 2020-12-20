@@ -62,6 +62,12 @@ html, body {
   object-fit: cover;
 }
 
+.playlistImage {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
 .row {
   position: relative;
   display: inline-block;
