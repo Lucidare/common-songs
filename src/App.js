@@ -367,7 +367,7 @@ function App() {
             : <Button className="greenBtn" onClick={logout}>LOG OUT</Button>
           }
         </div>
-        <p className="text">© Brian Au 2020</p>
+        <p className="text">© 2020 - common-songs.com - Brian Au </p>
         <Coffee/>
       </Row>
     </Container>
