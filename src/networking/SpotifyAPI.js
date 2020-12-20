@@ -36,7 +36,7 @@ var Spotify = (function () {
 
     this.createPlaylist = (name) => {
         return axios.post(baseURL + "users/" + _userId + "/playlists", {
-            name: "Common Songs with " + name,
+            name: "Common Songs - " + name,
             description: "Created by https://common-songs.com"
         } ,{
             headers: {

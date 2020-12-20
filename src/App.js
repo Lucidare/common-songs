@@ -284,7 +284,7 @@ function App() {
           }
         </div>
         <p className="text">© Brian Au 2020</p>
-        {/* <Coffee/> */}
+        <Coffee/>
       </Row>
     </Container>
   );
