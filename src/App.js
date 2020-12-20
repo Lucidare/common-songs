@@ -193,7 +193,7 @@ function App() {
 
     spotifyApi.getPlaylists(id).then((response) => {
       setSearchUserPlaylists(response.data.items);
-      if (response.data.items.length == 0) {
+      if (response.data.items.length === 0) {
         setOtherSongsState(otherSongsStates.NO_PLAYLIST);
       }
     }).catch((error => {
@@ -218,7 +218,7 @@ function App() {
       const data = response.data;
       const items = response.data.items.map(obj => {
         return obj.track;
-      });
+      }).filter(n => n);
       const newSongs = [...oldSongs, ...items]
       if (data.next != null) {
         getPlaylistSongs(id, offset + NUM_SONGS, newSongs);
@@ -309,7 +309,7 @@ function App() {
       const data = response.data;
       const items = response.data.items.map(obj => {
         return obj.track;
-      });
+      }).filter(n => n);
       const newSongs = [...oldSongs, ...items]
       if (data.next !== null) {
         getPlaylistsSongs(ids, offset + NUM_SONGS, newSongs, currIdx);
