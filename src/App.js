@@ -122,6 +122,7 @@ function App() {
     setLikedSongs([]);
     setFirstSongsState(firstSongsStates.NOT_APPLICIABLE);
     setOtherSongsState(otherSongsStates.NOT_APPLICIABLE);
+    setSearchUser(null);
     setSearchUserPlaylists([]);
     setCommon([]);
     setNewPlaylistState(newPlaylistStates.NOT_APPLICIABLE);
@@ -342,7 +343,7 @@ function App() {
         <h1 className="title">Common Songs</h1>
         <p className="subtitle">Find what songs you have in common</p>
         {user != null &&
-          <User name={user.display_name} images={user.images}/>
+          <User text={"Logged in as " + user.display_name} images={user.images}/>
         }
         {firstSongsState !== firstSongsStates.NOT_APPLICIABLE &&
           <p className="text">Liked Songs: {firstSongsState}</p>
@@ -351,6 +352,9 @@ function App() {
           <Input input={input} setInput={setInput} validateInput={readInput}/>
         }
 
+        {searchUser != null &&
+          <User text={searchUser.display_name} images={searchUser.images}/>
+        }
         {searchUserPlaylists.length > 0 &&
           <Playlists onClick={fromImage} playlists={searchUserPlaylists}/>
         }

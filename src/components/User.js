@@ -7,7 +7,7 @@ export default function User(props) {
       {images.length > 0 &&
         <img className="profileImage" src={images[0].url} alt="user's icon"></img>
       }
-      <p className="text">Logged in as {props.name}</p>
+      <p className="text">{props.text}</p>
     </div>
   );
 }
