@@ -60,8 +60,8 @@ function App() {
     var token = localStorage.getItem("token");
     if (token == null) {
       token = new URLSearchParams(window.location.search).get('access_token');
-      window.history.replaceState(null, null, window.location.pathname);
     }
+    window.history.replaceState(null, null, window.location.pathname);
 
     if (token != null) {
       localStorage.setItem("token", token);
