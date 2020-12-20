@@ -40,6 +40,7 @@ function App() {
     INVALID: "INVALID INPUT",
     LOADING: "Getting Songs...",
     ERROR: "Unable to get playlists/songs, please try again later",
+    NO_PLAYLIST: "No public playlists found",
     COMPARING: "Finding Common Songs...",
     COMPLETE: "Common Songs Found"
   }
@@ -127,17 +128,23 @@ function App() {
   }
 
   function readInput() {
-    var split = input.trim().split(":");
-    var isPlaylist = true;
     var id = "";
-    if (split.length !== 3) {
-      split = input.trim().split("/");
-      if (split.length === 5 && split[0] === "https:" && split[1] === "" && split[2] === "open.spotify.com") {
-        if (split[3] === "playlist" || split[3] === "user") {
-          split = split[4].split("?")
-          isPlaylist = split[3] === "playlist"
-          if (split.length > 0 && split.length <= 2) {
-            id = split[0];
+    if (!input.includes(":") && !input.includes("/")) {
+      id = input;
+    } else {
+      var split = input.trim().split(":");
+      var isPlaylist = true;
+      if (split.length !== 3) {
+        split = input.trim().split("/");
+        if (split.length === 5 && split[0] === "https:" && split[1] === "" && split[2] === "open.spotify.com") {
+          if (split[3] === "playlist" || split[3] === "user") {
+            split = split[4].split("?")
+            isPlaylist = split[3] === "playlist"
+            if (split.length > 0 && split.length <= 2) {
+              id = split[0];
+            } else {
+              setOtherSongsState(otherSongsStates.INVALID);
+            }
           } else {
             setOtherSongsState(otherSongsStates.INVALID);
           }
@@ -145,18 +152,16 @@ function App() {
           setOtherSongsState(otherSongsStates.INVALID);
         }
       } else {
-        setOtherSongsState(otherSongsStates.INVALID);
-      }
-    } else {
-      if (split[0] === "spotify") {
-        if (split[1] === "playlist" || split[1] === "user") {
-          isPlaylist = split[1] === "playlist"
-          id = split[2]
+        if (split[0] === "spotify") {
+          if (split[1] === "playlist" || split[1] === "user") {
+            isPlaylist = split[1] === "playlist"
+            id = split[2]
+          } else {
+            setOtherSongsState(otherSongsStates.INVALID);
+          }
         } else {
           setOtherSongsState(otherSongsStates.INVALID);
         }
-      } else {
-        setOtherSongsState(otherSongsStates.INVALID);
       }
     }
 
@@ -188,7 +193,9 @@ function App() {
 
     spotifyApi.getPlaylists(id).then((response) => {
       setSearchUserPlaylists(response.data.items);
-      console.log(response);
+      if (response.data.items.length == 0) {
+        setOtherSongsState(otherSongsStates.NO_PLAYLIST);
+      }
     }).catch((error => {
       setSearchUserPlaylists([]);
       setOtherSongsState(otherSongsStates.ERROR);

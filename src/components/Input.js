@@ -7,7 +7,7 @@ export default function Input(props) {
     const validateInput = props.validateInput;
     return (  
         <div>
-        <p className="text">Enter a user or playlist link/URI</p>
+        <p className="text">Enter a username, playlist or user link/URI</p>
         <input name="input" value={input} onChange={e => setInput(e.target.value)}/>
         <div className="spaced">
           <Button className="greenBtn" onClick={validateInput}>Find Common Songs</Button>
