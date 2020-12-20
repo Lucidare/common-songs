@@ -6,7 +6,7 @@ import SongList from './components/SongList';
 import Input from './components/Input';
 import Coffee from './components/BuyMeACoffee';
 import Spotify from './networking/SpotifyAPI';
-import spotify_logo from './spotify-icons-logos/logos/01_RGB/02_PNG/Spotify_Logo_RGB_White.png'
+import spotify_logo from './imgs/spotify-icons-logos/logos/01_RGB/02_PNG/Spotify_Logo_RGB_White.png'
 import './App.css';
 import ReactGA from 'react-ga';
 
@@ -178,7 +178,7 @@ function App() {
   }
 
   function getUsersPlaylists(id) {
-    console.log(id);
+    setPlaylistName(id);
     spotifyApi.getPlaylists(id).then((response) => {
       setSearchUserPlaylists(response.data.items);
       console.log(response);
@@ -265,9 +265,48 @@ function App() {
     }
   }
 
-  function testFunc(id) {
-    // console.log(id)
-    getSongsFromPlaylist(id);
+  function fromImage(id) {
+    if (id !== "") {
+      getSongsFromPlaylist(id);
+    } else {
+      getAllSongs();
+    }
+  }
+
+  function getAllSongs() {
+    setCommon([]);
+    setOtherSongsState(otherSongsStates.LOADING);
+
+    const playlistIds = searchUserPlaylists.map((playlist) => {
+      return playlist.id
+    });
+    getPlaylistsSongs(playlistIds);
+  }
+  
+  function getPlaylistsSongs(ids, offset = 0, oldSongs = [], currIdx = 0) {
+    const NUM_SONGS  = 100;
+    const id = ids[currIdx];
+    
+    spotifyApi.getPlaylistSongs(id, offset).then((response) => {
+      const data = response.data;
+      const items = response.data.items.map(obj => {
+        return obj.track;
+      });
+      const newSongs = [...oldSongs, ...items]
+      if (data.next !== null) {
+        getPlaylistsSongs(ids, offset + NUM_SONGS, newSongs, currIdx);
+      } else {
+        if (currIdx === ids.length - 1) {
+          setOtherSongsState(otherSongsStates.COMPARING)
+          findCommonSongs(newSongs)
+        } else {
+          getPlaylistsSongs(ids, 0, newSongs, currIdx+1);
+        }
+      }
+    }).catch((error) => {
+      setOtherSongsState(otherSongsStates.ERROR);
+      console.log(error);
+    });
   }
 
   return (
@@ -286,7 +325,7 @@ function App() {
         }
 
         {searchUserPlaylists.length > 0 &&
-          <Playlists onClick={testFunc} playlists={searchUserPlaylists}/>
+          <Playlists onClick={fromImage} playlists={searchUserPlaylists}/>
         }
 
         <p className="subtitle">{otherSongsState}</p>

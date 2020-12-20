@@ -1,5 +1,6 @@
 import React from 'react';
 import { Row } from 'reactstrap'
+import logo from '../imgs/logo512.png'
 
 export default function Playlists(props) {
 
@@ -14,10 +15,16 @@ export default function Playlists(props) {
             }
             <p key={playlist.id} className="text">
               {playlist.name}
-            </p>  
+            </p>
           </Row>
         );
       })}
+      <Row className="spaced">
+        <img className="playlistImage" src={logo} alt="all playlists" onClick={() => props.onClick("")}/>
+        <p className="text">
+          All Playlists
+        </p>
+      </Row>
     </ul>
   );
 }
