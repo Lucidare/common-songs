@@ -6,6 +6,8 @@ import SongList from './components/SongList';
 import Input from './components/Input';
 import Coffee from './components/BuyMeACoffee';
 import Spotify from './networking/SpotifyAPI';
+import spotify_icon from './spotify-icons-logos/icons/01_RGB/02_PNG/Spotify_Icon_RGB_White.png'
+import spotify_logo from './spotify-icons-logos/logos/01_RGB/02_PNG/Spotify_Logo_RGB_White.png'
 import './App.css';
 import ReactGA from 'react-ga';
 
@@ -114,7 +116,6 @@ function App() {
     setSongsState(otherSongsState.NOT_APPLICIABLE);
     setCommon([]);
     setNewPlaylistState(newPlaylistStates.NOT_APPLICIABLE);
-    spotifyApi.cancelTokenSource.cancel();
   }
 
   function readInput() {
@@ -276,7 +277,9 @@ function App() {
 
         <div>
           {localStorage.getItem("token") == null 
-            ? <Button className="greenBtn" onClick={login}>LOG IN WITH SPOTIFY</Button>
+            ? <Button className="greenBtn" onClick={login}>
+                <img className="spotifyLogo" alt="spotify_logo" src={spotify_logo}/>
+              </Button>
             : <Button className="greenBtn" onClick={logout}>LOG OUT</Button>
           }
         </div>

@@ -46,7 +46,7 @@ html, body {
   padding-left: 50px;
   padding-right: 50px;
   border-radius: 30px;
-  border-color:  var(--green)
+  border-color:  var(--green);
 }
 .greenBtn:hover {
   background-color: var(--light-green);
@@ -73,6 +73,10 @@ html, body {
 
 .spaced {
   padding: 20px;
+}
+
+.spotifyLogo {
+  width: 100px;
 }
 
 .coffee {
