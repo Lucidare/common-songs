@@ -21,7 +21,6 @@ function App() {
   
   const [input, setInput] = useState("");
 
-  const [searchUser, setSearchUser] = useState({name: ""});
   const [searchUserPlaylists, setSearchUserPlaylists] = useState([]);
 
   const [playlistName, setPlaylistName] = useState("");
@@ -121,7 +120,6 @@ function App() {
     setLikedSongs([]);
     setFirstSongsState(firstSongsStates.NOT_APPLICIABLE);
     setOtherSongsState(otherSongsStates.NOT_APPLICIABLE);
-    setSearchUser(null);
     setSearchUserPlaylists([]);
     setCommon([]);
     setNewPlaylistState(newPlaylistStates.NOT_APPLICIABLE);
@@ -165,8 +163,7 @@ function App() {
       if (isPlaylist) {
         getSongsFromPlaylist(id);
       } else {
-        setOtherSongsState("User's not supported yet");
-        // getUsersPlaylists(id);
+        getUsersPlaylists(id);
       }
     }
 
@@ -268,6 +265,11 @@ function App() {
     }
   }
 
+  function testFunc(id) {
+    // console.log(id)
+    getSongsFromPlaylist(id);
+  }
+
   return (
     <Container className="container">
       <Row className="center">
@@ -283,11 +285,8 @@ function App() {
           <Input input={input} setInput={setInput} validateInput={readInput}/>
         }
 
-        {/* {searchUser != null &&
-          <User name={searchUser.name} images={searchUser.images}/>
-        } */}
         {searchUserPlaylists.length > 0 &&
-          <Playlists onClick={() => {}} playlists={searchUserPlaylists}/>
+          <Playlists onClick={testFunc} playlists={searchUserPlaylists}/>
         }
 
         <p className="subtitle">{otherSongsState}</p>
