@@ -16,7 +16,7 @@ var spotifyApi = new Spotify();
 
 function App() {
   const [user, setUser] = useState(null);
-  const [playlists, setPlaylists] = useState([]);
+  // const [playlists, setPlaylists] = useState([]);
   const [likedSongs, setLikedSongs] = useState([]);
   
   const [input, setInput] = useState("");
@@ -75,11 +75,11 @@ function App() {
         console.log(error);
       });
 
-      spotifyApi.getMyPlaylists().then((response) => {
-        setPlaylists(response.data.items);
-      }).catch((error) => {
-        console.log(error);
-      });
+      // spotifyApi.getMyPlaylists().then((response) => {
+      //   setPlaylists(response.data.items);
+      // }).catch((error) => {
+      //   console.log(error);
+      // });
 
       const getLikedSongs = (offset = 0, songs = []) => {
         const NUM_SONGS  = 50;
@@ -118,7 +118,7 @@ function App() {
   function logout() {
     localStorage.removeItem("token");
     setUser(null);
-    setPlaylists([]);
+    // setPlaylists([]);
     setLikedSongs([]);
     setFirstSongsState(firstSongsStates.NOT_APPLICIABLE);
     setOtherSongsState(otherSongsStates.NOT_APPLICIABLE);
