@@ -57,7 +57,7 @@ function App() {
   document.title = "Common Songs"
 
   useEffect(() => {
-    var token = localStorage.getItem("token");
+    let token = localStorage.getItem("token");
     if (token == null) {
       token = new URLSearchParams(window.location.search).get('access_token');
     }
@@ -83,7 +83,7 @@ function App() {
 
       const getLikedSongs = (offset = 0, songs = []) => {
         const NUM_SONGS  = 50;
-        var newSongs = songs;
+        let newSongs = songs;
         spotifyApi.getLikedSongs(offset, NUM_SONGS).then((response) => {
           const data = response.data;
           
@@ -128,11 +128,11 @@ function App() {
   }
 
   function readInput() {
-    var id = "";
+    let id = "";
     if (!input.includes(":") && !input.includes("/")) {
       id = input;
     } else {
-      var split = input.trim().split(":");
+      let split = input.trim().split(":");
       var isPlaylist = true;
       if (split.length !== 3) {
         split = input.trim().split("/");
@@ -239,7 +239,7 @@ function App() {
   }
 
   function contains(list, obj) {
-    for (var i = 0; i < list.length; i++) {
+    for (let i = 0; i < list.length; i++) {
       if (list[i].id === obj.id) {
         return true;
       }
@@ -260,25 +260,34 @@ function App() {
   }
 
   function addAllSongsToNewPlaylist(id) {
-    var i,j,chunk = 100;
-    var uris = common.map(track => {
+    let i,j,chunk = 100;
+    let uris = common.map(track => {
       return track.uri;
     })
-    var numCallsNeeded = (uris.length/100)|0;
-    var numCallsCompleted = 0;
-    var numCallsFailed = 0;
+    let numCallsNeeded = (uris.length/100)|0;
+    let numCallsCompleted = 0;
+    let numCallsFailed = 0;
+
+    function success(needed, completed, failed, response) {
+      if (completed === needed && failed === 0) {
+        setNewPlaylistState("https://open.spotify.com/playlist/" + id);
+      }
+    }
+
+    function fail(failed, error) {
+      setNewPlaylistState(newPlaylistStates.ERROR + " https://open.spotify.com/playlist/" + id);
+      console.log(error);
+      failed += 1;
+    }
+
+    function final(completed) {
+      completed += 1;
+    }
+
     for (i=0,j=uris.length; i<j; i+=chunk) {
-      spotifyApi.addToPlaylist(id, uris.slice(i,i+chunk)).then((response) => {
-        if (numCallsCompleted === numCallsNeeded && numCallsFailed === 0) {
-          setNewPlaylistState("https://open.spotify.com/playlist/" + id);
-        }
-      }).catch((error) => {
-        setNewPlaylistState(newPlaylistStates.ERROR + " https://open.spotify.com/playlist/" + id);
-        console.log(error);
-        numCallsFailed += 1;
-      }).finally(() => {
-        numCallsCompleted += 1;
-      });
+      spotifyApi.addToPlaylist(id, uris.slice(i,i+chunk)).then((response) => success(numCallsNeeded, numCallsCompleted, numCallsFailed, response))
+      .catch((error) => fail(numCallsFailed, error))
+      .finally(() => final());
     }
   }
 
