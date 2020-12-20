@@ -21,6 +21,7 @@ function App() {
   
   const [input, setInput] = useState("");
 
+  const [searchUser, setSearchUser] = useState(null);
   const [searchUserPlaylists, setSearchUserPlaylists] = useState([]);
 
   const [playlistName, setPlaylistName] = useState("");
@@ -38,7 +39,7 @@ function App() {
     NOT_APPLICIABLE: "",
     INVALID: "INVALID INPUT",
     LOADING: "Getting Songs...",
-    ERROR: "Unable to get songs, please try again later",
+    ERROR: "Unable to get playlists/songs, please try again later",
     COMPARING: "Finding Common Songs...",
     COMPLETE: "Common Songs Found"
   }
@@ -163,6 +164,7 @@ function App() {
       if (isPlaylist) {
         getSongsFromPlaylist(id);
       } else {
+        setOtherSongsState(otherSongsStates.NOT_APPLICIABLE);
         getUsersPlaylists(id);
       }
     }
@@ -178,11 +180,19 @@ function App() {
   }
 
   function getUsersPlaylists(id) {
-    setPlaylistName(id);
+    spotifyApi.getUser(id).then((response) => {
+      setSearchUser(response.data);
+    }).catch((error => {
+      console.log(error);
+    }));
+
     spotifyApi.getPlaylists(id).then((response) => {
       setSearchUserPlaylists(response.data.items);
       console.log(response);
     }).catch((error => {
+      setSearchUserPlaylists([]);
+      setOtherSongsState(otherSongsStates.ERROR);
+      setCommon([]);
       console.log(error);
     }));
   }
@@ -269,6 +279,7 @@ function App() {
     if (id !== "") {
       getSongsFromPlaylist(id);
     } else {
+      setPlaylistName(searchUser.display_name);
       getAllSongs();
     }
   }

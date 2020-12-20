@@ -34,6 +34,10 @@ var Spotify = (function () {
         return axios.get(baseURL + "playlists/" + id, { headers: { Authorization: 'Bearer ' + _token } });
     }
 
+    this.getUser = (id) => {
+        return axios.get(baseURL + "users/" + id, { headers: { Authorization: 'Bearer ' + _token } });
+    }
+
     this.getPlaylists = (id, offset = 0, limit = 20) => {
         return axios.get(baseURL + "users/" + id + "/playlists?offset=" + offset + "&limit=" + limit, { headers: { Authorization: 'Bearer ' + _token } });
     }
