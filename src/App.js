@@ -132,7 +132,7 @@ function App() {
     setUser(null);
     let id = "";
     if (!input.includes(":") && !input.includes("/")) {
-      id = input;
+      id = input.trim();
     } else {
       let split = input.trim().split(":");
       var isPlaylist = true;
