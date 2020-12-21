@@ -12,7 +12,7 @@ import ReactGA from 'react-ga';
 
 ReactGA.initialize('UA-147243437-1');
 
-var spotifyApi = new Spotify();
+const spotifyApi = new Spotify();
 
 function App() {
   const [user, setUser] = useState(null);
@@ -129,6 +129,7 @@ function App() {
   }
 
   function readInput() {
+    setUser(null);
     let id = "";
     if (!input.includes(":") && !input.includes("/")) {
       id = input;
@@ -332,6 +333,7 @@ function App() {
         }
       }
     }).catch((error) => {
+      setSearchUser(null);
       setOtherSongsState(otherSongsStates.ERROR);
       console.log(error);
     });
