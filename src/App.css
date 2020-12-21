@@ -83,6 +83,10 @@ html, body {
   padding: 20px;
 }
 
+.spaced-top {
+  padding-top: 20px;
+}
+
 .spotifyLogo {
   width: 100px;
 }

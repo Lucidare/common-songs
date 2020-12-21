@@ -382,6 +382,11 @@ function App() {
             : <Button className="greenBtn" onClick={logout}>LOG OUT</Button>
           }
         </div>
+        <div className="spaced-top">
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSeuP72GZ_BustWMgPM9esF1McBbghuympQes7slHGmaX3AprQ/viewform?usp=sf_link">
+            <Button className="greenBtn">Feedback</Button>
+          </a>
+        </div>
         <p className="text">© 2020 | common-songs.com | Brian Au </p>
         <Coffee/>
       </Row>
