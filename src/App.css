@@ -47,6 +47,7 @@ html, body {
   padding-right: 50px;
   border-radius: 30px;
   border-color:  var(--green);
+  cursor: pointer;
 }
 .greenBtn:hover {
   background-color: var(--light-green);
