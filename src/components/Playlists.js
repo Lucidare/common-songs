@@ -12,7 +12,7 @@ export default function Playlists(props) {
           <Row className="spaced">
             {playlist.images.length > 0
               ? <img className="playlistImage" src={playlist.images[0].url} alt="playlist" onClick={() => props.onClick(playlist.id)}/>
-              : <img className="playlistImage" src={logo} alt="all playlists" onClick={() => props.onClick("")}/>
+              : <img className="playlistImage" src={logo} alt="all playlists" onClick={() => props.onClick(playlist.id)}/>
             }
             <p key={playlist.id} className="text">
               {playlist.name}
