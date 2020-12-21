@@ -10,7 +10,7 @@ import spotify_logo from './imgs/spotify-icons-logos/logos/01_RGB/02_PNG/Spotify
 import './App.css';
 import ReactGA from 'react-ga';
 
-ReactGA.initialize('UA-147243437-1');
+ReactGA.initialize('UA-147243437-2');
 
 const spotifyApi = new Spotify();
 
