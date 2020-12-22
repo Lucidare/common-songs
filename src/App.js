@@ -129,7 +129,6 @@ function App() {
   }
 
   function readInput() {
-    setSearchUser(null);
     let id = "";
     if (!input.includes(":") && !input.includes("/")) {
       id = input.trim();
@@ -168,6 +167,7 @@ function App() {
     }
 
     if (id !== "") {
+      setSearchUser(null);
       if (isPlaylist) {
         getSongsFromPlaylist(id);
       } else {
