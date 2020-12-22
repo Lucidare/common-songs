@@ -129,7 +129,7 @@ function App() {
   }
 
   function readInput() {
-    setUser(null);
+    setSearchUser(null);
     let id = "";
     if (!input.includes(":") && !input.includes("/")) {
       id = input.trim();
