@@ -140,8 +140,8 @@ function App() {
         split = input.trim().split("/");
         if (split.length === 5 && split[0] === "https:" && split[1] === "" && split[2] === "open.spotify.com") {
           if (split[3] === "playlist" || split[3] === "user") {
-            split = split[4].split("?")
             isPlaylist = split[3] === "playlist"
+            split = split[4].split("?")
             if (split.length > 0 && split.length <= 2) {
               id = split[0];
             } else {
