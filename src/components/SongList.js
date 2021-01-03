@@ -14,7 +14,7 @@ export default function SongList(props) {
                 })}
         </ul>
         <p>
-            <Button className="greenBtn" onClick={props.makeNewPlaylist}>Add these songs to playlist</Button>
+            <Button className="greenBtn" onClick={props.makeNewPlaylist}>Create a playlist with these songs</Button>
         </p>
         </div>
     );
