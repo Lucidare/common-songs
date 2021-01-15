@@ -110,6 +110,23 @@ function App() {
       }
       setFirstSongsState(firstSongsStates.LOADING);
       getLikedSongs();
+      
+      function listToCount(list) {
+        var artistCounts = Array.from(new Set(list)).map(a =>
+          ({artist: a, count: list.filter(f => f.id === a.id).length}));
+        var repeats  = {};
+        for (var i = 0; i < artistCounts.length; i++) {
+          repeats[artistCounts[i].artist.id] = [artistCounts[i].artist.name, artistCounts[i].count]
+        }
+        var unique = Object.values(repeats)
+        unique.splice(0, 0, ["Artist", "Number of Songs"])
+        return unique
+      }
+    
+      function makeArtistChart(playlist) {
+        let artists = playlist.flatMap( track => track.artists);
+        setArtistChart(listToCount(artists));
+      }
     }
   }, [firstSongsStates.FAILED, firstSongsStates.COMPLETE, firstSongsStates.LOADING]);
 
@@ -342,23 +359,6 @@ function App() {
       setOtherSongsState(otherSongsStates.ERROR);
       console.log(error);
     });
-  }
-
-  function listToCount(list) {
-    var artistCounts = Array.from(new Set(list)).map(a =>
-      ({artist: a, count: list.filter(f => f.id === a.id).length}));
-    var repeats  = {};
-    for (var i = 0; i < artistCounts.length; i++) {
-      repeats[artistCounts[i].artist.id] = [artistCounts[i].artist.name, artistCounts[i].count]
-    }
-    var unique = Object.values(repeats)
-    unique.splice(0, 0, ["Artist", "Number of Songs"])
-    return unique
-  }
-
-  function makeArtistChart(playlist) {
-    let artists = playlist.flatMap( track => track.artists);
-    setArtistChart(listToCount(artists));
   }
 
   return (
