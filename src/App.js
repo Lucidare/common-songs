@@ -9,6 +9,7 @@ import Spotify from './networking/SpotifyAPI';
 import spotify_logo from './imgs/spotify-icons-logos/logos/01_RGB/02_PNG/Spotify_Logo_RGB_White.png'
 import './App.css';
 import ReactGA from 'react-ga';
+import Chart from "react-google-charts";
 
 ReactGA.initialize('UA-147243437-2');
 ReactGA.pageview(window.location.pathname + window.location.search);
@@ -19,6 +20,7 @@ function App() {
   const [user, setUser] = useState(null);
   // const [playlists, setPlaylists] = useState([]);
   const [likedSongs, setLikedSongs] = useState([]);
+  const [artistChart, setArtistChart] = useState([]);
   
   const [input, setInput] = useState("");
 
@@ -97,6 +99,7 @@ function App() {
             getLikedSongs(offset + NUM_SONGS, newSongs);
           } else {
             setLikedSongs(newSongs);
+            makeArtistChart(newSongs);
             setFirstSongsState(firstSongsStates.COMPLETE);
           }
         }).catch((error) => {
@@ -120,6 +123,7 @@ function App() {
     localStorage.removeItem("token");
     setUser(null);
     // setPlaylists([]);
+    setArtistChart([]);
     setLikedSongs([]);
     setFirstSongsState(firstSongsStates.NOT_APPLICIABLE);
     setOtherSongsState(otherSongsStates.NOT_APPLICIABLE);
@@ -340,6 +344,23 @@ function App() {
     });
   }
 
+  function listToCount(list) {
+    var artistCounts = Array.from(new Set(list)).map(a =>
+      ({artist: a, count: list.filter(f => f.id === a.id).length}));
+    var repeats  = {};
+    for (var i = 0; i < artistCounts.length; i++) {
+      repeats[artistCounts[i].artist.id] = [artistCounts[i].artist.name, artistCounts[i].count]
+    }
+    var unique = Object.values(repeats)
+    unique.splice(0, 0, ["Artist", "Number of Songs"])
+    return unique
+  }
+
+  function makeArtistChart(playlist) {
+    let artists = playlist.flatMap( track => track.artists);
+    setArtistChart(listToCount(artists));
+  }
+
   return (
     <Container className="container">
       <Row className="center">
@@ -351,10 +372,25 @@ function App() {
         {firstSongsState !== firstSongsStates.NOT_APPLICIABLE &&
           <p className="text">Liked Songs: {firstSongsState}</p>
         }
+        {artistChart.length > 0 &&
+          <Chart
+            chartType="PieChart"
+            loader={<div className="text">Loading artists chart...</div>}
+            data={artistChart}
+            options={{
+              title: 'Artists',
+              titleTextStyle: { color: "#ffffff" },
+              legend: { textStyle: { color: "#ffffff" } },
+              sliceVisibilityThreshold: 0.01,
+              is3D: true,
+              backgroundColor: "",
+            }}
+            rootProps={{ 'data-testid': '1' }}
+          />
+        }
         {firstSongsState === firstSongsStates.COMPLETE && 
           <Input input={input} setInput={setInput} validateInput={readInput}/>
         }
-
         {searchUser != null &&
           <User text={searchUser.display_name} images={searchUser.images}/>
         }
