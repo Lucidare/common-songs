@@ -133,7 +133,7 @@ function App() {
   function login() {
     window.location = window.location.href.includes('localhost')
       ? 'http://localhost:8888/login'
-      : 'https://common-songs-auth.herokuapp.com/login'
+      : 'https://common-songs-auth.onrender.com/login'
   }
 
   function logout() {
